@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBM Calculator</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json"> <!-- Link to manifest.json -->
+    <style>
+      /* General Reset */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f1f1f1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .container {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        width: 100%;
+        max-width: 400px;
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+
+      h1 {
+        color: white;
+        margin-bottom: 20px;
+      }
+
+      input, select, button {
+        width: 100%;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+      }
+
+      input, select {
+        background-color: white;
+      }
+
+      button {
+        background-color: #2575fc;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+      }
+
+      button:hover {
+        background-color: #1d62b4;
+      }
+
+      .result {
+        font-size: 24px;
+        font-weight: bold;
+        color: #fff;
+        margin-top: 20px;
+      }
+
+      /* Calculator Styles */
+      .second-calculator {
+        margin-top: 40px;
+        padding: 15px;
+        background: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .calculator {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+      }
+
+      .calculator button {
+        background-color: #34495e;
+        color: white;
+        font-size: 20px;
+        padding: 25px;
+        border: none;
+        border-radius: 8px;
+        transition: background-color 0.3s;
+      }
+
+      .calculator button:hover {
+        background-color: #16a085;
+      }
+
+      .button-clear {
+        background-color: #e74c3c;
+      }
+
+      .button-equal {
+        background-color: #2ecc71;
+      }
+
+      #calculator-display {
+        grid-column: span 4;
+        background-color: #34495e;
+        color: white;
+        font-size: 32px;
+        text-align: right;
+        padding: 20px;
+        border-radius: 8px;
+        height: 60px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+      }
+
+      /* Fullscreen Mode */
+      @media (max-width: 768px) {
+        .container {
+          width: 80%;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          width: 90%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>CBM Calculator</h1>
+      <form id="cbmForm">
+        <input type="number" id="length" placeholder="Length" required>
+        <input type="number" id="width" placeholder="Width" required>
+        <input type="number" id="height" placeholder="Height" required>
+        <input type="number" id="quantity" placeholder="Quantity" required>
+        <select id="unit" required>
+          <option value="mm">mm</option>
+          <option value="cm">cm</option>
+          <option value="inch">inch</option>
+          <option value="feet">feet</option>
+        </select>
+        <button type="submit">Calculate</button>
+      </form>
+
+      <div class="result" id="result"></div>
+
+      <!-- Second Calculator with custom design -->
+      <div class="second-calculator">
+        <div id="calculator-display">0</div>
+        <div class="calculator">
+          <button class="button-clear" onclick="clearDisplay()">C</button>
+          <button onclick="appendNumber(7)">7</button>
+          <button onclick="appendNumber(8)">8</button>
+          <button onclick="appendNumber(9)">9</button>
+          <button onclick="setOperation('+')">+</button>
+          <button onclick="appendNumber(4)">4</button>
+          <button onclick="appendNumber(5)">5</button>
+          <button onclick="appendNumber(6)">6</button>
+          <button onclick="setOperation('-')">-</button>
+          <button onclick="appendNumber(1)">1</button>
+          <button onclick="appendNumber(2)">2</button>
+          <button onclick="appendNumber(3)">3</button>
+          <button onclick="setOperation('*')">*</button>
+          <button onclick="appendNumber(0)">0</button>
+          <button onclick="appendNumber('.')">.</button>
+          <button class="button-equal" onclick="calculateResult()">=</button>
+          <button onclick="setOperation('/')">/</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let currentInput = '0';
+      let currentOperation = null;
+      let previousInput = null;
+
+      function updateDisplay() {
+        document.getElementById('calculator-display').textContent = currentInput;
+      }
+
+      function appendNumber(number) {
+        if (currentInput === '0') {
+          currentInput = String(number);
+        } else {
+          currentInput += String(number);
+        }
+        updateDisplay();
+      }
+
+      function setOperation(operation) {
+        if (currentOperation !== null) {
+          calculateResult();
+        }
+        previousInput = currentInput;
+        currentInput = '0';
+        currentOperation = operation;
+      }
+
+      function calculateResult() {
+        if (currentOperation === null || previousInput === null) return;
+        let result;
+        const prev = parseFloat(previousInput);
+        const current = parseFloat(currentInput);
+        switch (currentOperation) {
+          case '+':
+            result = prev + current;
+            break;
+          case '-':
+            result = prev - current;
+            break;
+          case '*':
+            result = prev * current;
+            break;
+          case '/':
+            result = prev / current;
+            break;
+        }
+
+        // Format the result to 3 decimal places and always show 3 decimals (e.g. 0.001, 0.000)
+        result = result.toFixed(3);  // Limits to 3 decimal places
+        
+        // Ensure we always display at least 3 decimals
+        currentInput = result;
+        currentOperation = null;
+        previousInput = null;
+        updateDisplay();
+      }
+
+      function clearDisplay() {
+        currentInput = '0';
+        currentOperation = null;
+        previousInput = null;
+        updateDisplay();
+      }
+
+      // First calculator (CBM)
+      document.getElementById('cbmForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        var length = parseFloat(document.getElementById('length').value);
+        var width = parseFloat(document.getElementById('width').value);
+        var height = parseFloat(document.getElementById('height').value);
+        var quantity = parseInt(document.getElementById('quantity').value);
+        var unit = document.getElementById('unit').value;
+
+        google.script.run.withSuccessHandler(function(result) {
+          document.getElementById('result').innerText = 'Total Volume: ' + result + ' m³';
+        }).calculateCBM(length, width, height, quantity, unit);
+      });
+    </script>
+  </body>
+</html>
